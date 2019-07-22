@@ -1,4 +1,4 @@
-package np.com.nawarajbista.shopinglist
+package np.com.nawarajbista.shoppinglist
 
 import org.junit.Test
 

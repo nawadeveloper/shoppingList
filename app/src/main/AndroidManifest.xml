@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="np.com.nawarajbista.shopinglist">
+          package="np.com.nawarajbista.shoppinglist">
 
     <application
             android:allowBackup="true"

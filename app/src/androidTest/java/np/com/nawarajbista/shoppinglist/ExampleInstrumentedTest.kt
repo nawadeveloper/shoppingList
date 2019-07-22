@@ -1,4 +1,4 @@
-package np.com.nawarajbista.shopinglist
+package np.com.nawarajbista.shoppinglist
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
