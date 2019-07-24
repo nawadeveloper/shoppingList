@@ -3,6 +3,7 @@
     <string name="add">add</string>
     <string name="add_item">add item</string>
     <string name="minus">-</string>
-    <string name="one">1</string>
     <string name="plus">+</string>
+    <string name="one">1</string>
+    <string name="our_shopping_item">our shopping item</string>
 </resources>
