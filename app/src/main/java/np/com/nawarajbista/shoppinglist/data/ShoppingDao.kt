@@ -14,6 +14,9 @@ interface ShoppingDao {
     @Query("DELETE FROM items WHERE itemId = :itemId")
     fun deleteItem(itemId: Long)
 
+    @Query("DELETE FROM items WHERE item_name = :itemName")
+    fun deleteItemByName(itemName: String)
+
     @Delete
     fun delete(model: ShoppingList)
 }

@@ -11,6 +11,7 @@ class ShoppingListGroup(private val sp: ShoppingList): Item<ViewHolder>() {
 
         viewHolder.itemView.textView_quantities.text = sp.quantities.toString()
         viewHolder.itemView.textView_name.text = sp.itemName
+        viewHolder.itemView.id = sp.itemId.toInt()
 
     }
 

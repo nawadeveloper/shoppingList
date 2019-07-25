@@ -4,13 +4,19 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.widget.Toast
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.shopping_row.view.*
 import np.com.nawarajbista.shoppinglist.data.AppDatabase
 import np.com.nawarajbista.shoppinglist.data.ShoppingList
 import np.com.nawarajbista.shoppinglist.viewHolder.ShoppingListGroup
+import java.lang.Exception
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         addListToAdapter()
 
         list_view.adapter = adapter
+        initSwipe()
 
 
         button_add.setOnClickListener {
@@ -113,5 +120,52 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+
+    private fun initSwipe() {
+        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or
+                    ItemTouchHelper.RIGHT) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                val nameOfItem = viewHolder.itemView.textView_name.text.toString()
+
+                val itemId = viewHolder.itemView.id.toLong()
+
+                if (direction == ItemTouchHelper.LEFT) {
+                    if(db == null) {
+                        Toast.
+                            makeText(
+                                this@MainActivity,
+                                "could not connect to data base",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                    } else {
+
+
+                        try {
+                            thread {
+                                db?.shoppingDao()?.deleteItem(itemId)
+                            }.start()
+                        }
+                        catch (e: Exception) {
+                            Log.d("message", "$itemId")
+                        }
+                    }
+                }
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(list_view)
     }
 }
