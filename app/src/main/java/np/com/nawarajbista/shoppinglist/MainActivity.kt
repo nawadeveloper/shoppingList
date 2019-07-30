@@ -1,9 +1,12 @@
 package np.com.nawarajbista.shoppinglist
 
+import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
@@ -11,7 +14,6 @@ import android.widget.Toast
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.shopping_row.view.*
 import np.com.nawarajbista.shoppinglist.data.AppDatabase
 import np.com.nawarajbista.shoppinglist.data.ShoppingList
 import np.com.nawarajbista.shoppinglist.viewHolder.ShoppingListGroup
@@ -126,8 +128,16 @@ class MainActivity : AppCompatActivity() {
     private fun initSwipe() {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
             0,
-            ItemTouchHelper.LEFT or
-                    ItemTouchHelper.RIGHT) {
+            ItemTouchHelper.LEFT
+                    //or ItemTouchHelper.RIGHT
+        ) {
+
+            val deleteIcon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
+            val intrinsicWidth = deleteIcon?.intrinsicWidth
+            val intrinsicHeight = deleteIcon?.intrinsicHeight
+            val background = ColorDrawable()
+            val backgroundColor = Color.parseColor("#f44336")
+            val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -138,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
 //                val nameOfItem = viewHolder.itemView.textView_name.text.toString()
 
                 val itemId = viewHolder.itemView.id.toLong()
@@ -163,6 +174,44 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+            }
+
+            override fun onChildDraw(
+                c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+            ) {
+
+                val itemView = viewHolder.itemView
+                val itemHeight = itemView.bottom - itemView.top
+                val isCanceled = dX == 0f && !isCurrentlyActive
+
+                if (isCanceled) {
+                    clearCanvas(c, itemView.right + dX, itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    return
+                }
+
+                // Draw the red delete background
+                background.color = backgroundColor
+                background.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                background.draw(c)
+
+                // Calculate position of delete icon
+                val deleteIconTop = itemView.top + (itemHeight - intrinsicHeight!!) / 2
+                val deleteIconMargin = (itemHeight - intrinsicHeight) / 2
+                val deleteIconLeft = itemView.right - deleteIconMargin - intrinsicWidth!!
+                val deleteIconRight = itemView.right - deleteIconMargin
+                val deleteIconBottom = deleteIconTop + intrinsicHeight
+
+                // Draw the delete icon
+                deleteIcon?.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+                deleteIcon?.draw(c)
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+
+            private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
+                c?.drawRect(left, top, right, bottom, clearPaint)
             }
         }
         val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
